@@ -1,9 +1,23 @@
 require 'amqp'
+
 module AdhearsionAmqp
   module ControllerMethods
+    
+    # creates connection params for AMQP.start
+    #
+    # @todo find better way use Loquacious::Configuration::Iterator
+    # to build Hash dynamically
+    def connection_params
+      { 
+        host: Adhearsion.config[:adhearsion_amqp].host,
+        port: Adhearsion.config[:adhearsion_amqp].port,
+        username: Adhearsion.config[:adhearsion_amqp].username,
+        password: Adhearsion.config[:adhearsion_amqp].password
+      }
+    end
 
     def publish(message)
-      AMQP.start do |connection|
+      AMQP.start(conneciton_params) do |connection|
         logger.debug "Connected to RabbitMQ. Running #{AMQP::VERSION} version of the gem..."
         channel = AMQP::Channel.new(connection)
 
@@ -19,12 +33,14 @@ module AdhearsionAmqp
         end
 
         exchange = channel.direct("", :durable => true)
-        queue    = channel.queue(Adhearsion.config[:adhearsion_amqp].queue)
+        # @note can be used for consumers
+        #queue    = channel.queue(Adhearsion.config[:adhearsion_amqp].queue)
 
         # create proc that publishes the message
-        # @note will call this later in #defer
+        # @see #defer
         pub = Proc.new do
-          exchange.publish(message, :routing_key => Adhearsion.config[:adhearsion_amqp].routing_key) do
+          exchange.publish(message, 
+                           :routing_key => Adhearsion.config[:adhearsion_amqp].routing_key) do
             connection.disconnect { EM.stop }
           end
         end

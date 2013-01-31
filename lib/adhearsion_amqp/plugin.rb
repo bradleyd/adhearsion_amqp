@@ -10,10 +10,12 @@ module AdhearsionAmqp
     # Basic configuration for the plugin
     #
     config :adhearsion_amqp do
-      greeting "Hello", :desc => "What to use to greet users"
       host "localhost", :desc => "The RabbitMQ host ip"
+      port 5672, :desc => "RabbitMQ port"
       queue "call_events", :desc => "The queue to attach to"
       routing_key "call_events", :desc => "The routing key to use for exchange"
+      username "guest", :desc => "RabbitMQ user"
+      password "guest", :desc => "RabbitMQ password"
 
     end
 

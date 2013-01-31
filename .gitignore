@@ -1,0 +1,10 @@
+*.gem
+.bundle
+Gemfile.lock
+pkg/*
+vendor/ruby
+coverage
+.*.swp
+vendor/bundle
+tags
+.rvmrc

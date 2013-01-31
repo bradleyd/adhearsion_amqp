@@ -1,5 +1,6 @@
 require 'adhearsion'
 require 'adhearsion_amqp'
+require "evented-spec"
 
 RSpec.configure do |config|
   config.color_enabled = true

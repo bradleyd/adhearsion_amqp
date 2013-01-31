@@ -16,8 +16,17 @@ module AdhearsionAmqp
       }
     end
 
-    def publish(message)
-      AMQP.start(conneciton_params) do |connection|
+    def self.queue
+      Adhearsion.config[:adhearsion_amqp].queue
+    end
+
+    def self.exchange
+      Adhearsion.config[:adhearsion_amqp].exchange
+    end
+
+
+    def publish_message(message)
+      AMQP.start(self.connection_params) do |connection|
         logger.debug "Connected to RabbitMQ. Running #{AMQP::VERSION} version of the gem..."
         channel = AMQP::Channel.new(connection)
 

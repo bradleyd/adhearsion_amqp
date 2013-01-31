@@ -14,8 +14,8 @@ Gem::Specification.new do |s|
   s.rubyforge_project = "adhearsion_amqp"
 
   # Use the following if using Git
-  # s.files         = `git ls-files`.split("\n")
-  # s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+  s.files         = `git ls-files`.split("\n")
+  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.files         = Dir.glob("{lib}/**/*") + %w( README.md Rakefile Gemfile)
   s.test_files    = Dir.glob("{spec}/**/*")
   s.require_paths = ["lib"]
@@ -29,4 +29,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency %q<rake>, [">= 0"]
   s.add_development_dependency %q<mocha>, [">= 0"]
   s.add_development_dependency %q<guard-rspec>
+  s.add_development_dependency %q<evented-spec>
  end

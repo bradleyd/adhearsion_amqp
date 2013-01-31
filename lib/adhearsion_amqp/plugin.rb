@@ -14,9 +14,9 @@ module AdhearsionAmqp
       port 5672, :desc => "RabbitMQ port"
       queue "call_events", :desc => "The queue to attach to"
       routing_key "call_events", :desc => "The routing key to use for exchange"
+      exchange "", :desc => "AMQP exchange--only direct is supported"
       username "guest", :desc => "RabbitMQ user"
       password "guest", :desc => "RabbitMQ password"
-
     end
 
     # Defining a Rake task is easy

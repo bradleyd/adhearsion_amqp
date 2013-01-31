@@ -12,6 +12,7 @@ Requirements
 ------------
 
 * Adhearsion 2.0+
+* ruby-amqp  0.9.8+
 * RabbitMQ server
 
 Install
@@ -30,6 +31,9 @@ Adhearsion.config.adhearsion_amqp do |config|
   config.port        = "AMQP port".to_i
   config.queue       = "AMQP Queue to bind to"
   config.routing_key = "AMQP routing key for exchange"
+  config.username    = "AMQP username"
+  config.password    = "AMQP password"
+  config.exchange    = "AMQP exchange--currently supports direct only"
 end
 ```
 
@@ -42,7 +46,7 @@ Usage
 class ClassicController < Adhearsion::CallController 
   before_call do 
     call.register_event_handler do |event| 
-      publish(event) 
+      publish_message(event) 
     end 
   end 
  

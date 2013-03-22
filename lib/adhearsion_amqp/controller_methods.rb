@@ -2,12 +2,14 @@ require 'amqp'
 
 module AdhearsionAmqp
   module ControllerMethods
-    
+    mattr_accessor :routing_key, :exchange, :queue
     # creates connection params for AMQP.start
     #
     # @todo find better way use Loquacious::Configuration::Iterator
     # to build Hash dynamically
     def connection_params
+        cfg = Adhearsion.config[:adhearsion_amqp]
+        logger.info "HASH: #{cfg}"
       { 
         host: Adhearsion.config[:adhearsion_amqp].host,
         port: Adhearsion.config[:adhearsion_amqp].port,
@@ -16,16 +18,21 @@ module AdhearsionAmqp
       }
     end
 
-    def self.queue
-      Adhearsion.config[:adhearsion_amqp].queue
+    def que
+      queue || Adhearsion.config[:adhearsion_amqp].queue
     end
 
-    def self.exchange
-      Adhearsion.config[:adhearsion_amqp].exchange
+    def exc
+      exchange || Adhearsion.config[:adhearsion_amqp].exchange
     end
 
+    def rk
+      routing_key || Adhearsion.config[:adhearsion_amqp].routing_key
+    end
 
     def publish_message(message)
+      yield ControllerMethods if block_given?
+      logger.info "RK: #{routing_key}"
       AMQP.start(self.connection_params) do |connection|
         logger.debug "Connected to RabbitMQ. Running #{AMQP::VERSION} version of the gem..."
         channel = AMQP::Channel.new(connection)
@@ -45,15 +52,18 @@ module AdhearsionAmqp
         # @note can be used for consumers
         #queue    = channel.queue(Adhearsion.config[:adhearsion_amqp].queue)
 
+        logger.info "PUBLISHING #{message} to #{self.rk}"
         # create proc that publishes the message
         # @see #defer
         pub = Proc.new do
+          logger.info "THREAD: #{Thread.current}"
           exchange.publish(message, 
-                           :routing_key => Adhearsion.config[:adhearsion_amqp].routing_key) do
+                           :routing_key => self.rk) do
             connection.disconnect { EM.stop }
           end
         end
         # publish on another thread
+        logger.info "THREAD BEFORE DEFER: #{Thread.current}"
         EM.defer(pub)
       end
     end
